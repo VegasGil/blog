@@ -5,461 +5,47 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>CYBER-AD | Blindaje Digital y Defensa Activa</title>
 <meta name="description" content="Ciberseguridad freelance a medida: hardening, Defender, Intune, auditoría de seguridad, detección de malware y análisis forense.">
+<meta name="theme-color" content="#0b1017">
+<!-- TODO: cambia por tu URL real -->
+<link rel="canonical" href="https://vegaseguridad.com/">
+<link rel="icon" href="cyber-ad-logo.png" type="image/png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="CYBER-AD | Blindaje Digital y Defensa Activa">
+<meta property="og:description" content="Hardening, Defender, Intune, auditoría y forense para pymes. 100% remoto.">
+<meta property="og:image" content="https://vegaseguridad.com/cyber-ad-logo.png">
+<meta name="twitter:card" content="summary_large_image">
 
-<!--
-  Content-Security-Policy (defensa en profundidad para el frontend).
-  'unsafe-inline' es necesario en script-src/style-src porque este archivo
-  usa <style> y <script> embebidos y estilos inline (single-file, sin build
-  step ni servidor que genere nonces). Sigue restringiendo TODO lo demás a
-  'self' y a los 3 dominios de terceros que realmente usa el sitio:
-  Google Fonts, Formspree (formulario) y Cloudflare Web Analytics.
-  Nota: frame-ancestors, sandbox y report-uri NO funcionan vía <meta> según
-  el spec de CSP (solo vía cabecera HTTP real) — GitHub Pages no permite
-  cabeceras personalizadas, así que esa protección anti-clickjacking
-  requeriría poner el sitio detrás de un proxy como Cloudflare.
--->
-<meta http-equiv="Content-Security-Policy" content="
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com;
-  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-  font-src 'self' https://fonts.gstatic.com;
-  img-src 'self' data:;
-  connect-src 'self' https://formspree.io https://static.cloudflareinsights.com https://cloudflareinsights.com;
-  form-action https://formspree.io;
-  base-uri 'self';
-  object-src 'none';
-">
-<meta http-equiv="X-Content-Type-Options" content="nosniff">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' data:; connect-src 'self' https://formspree.io https://cloudflareinsights.com; form-action https://formspree.io; base-uri 'self'; object-src 'none';">
 <meta name="referrer" content="strict-origin-when-cross-origin">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
-
-<style>
-  :root{
-    --bg-deep:#0b1017;
-    --bg-panel:#16213E;
-    --card:#2d3748;
-    --card-border:rgba(148,163,184,0.14);
-    --neon:#00ff66;
-    --neon-2:#39FF14;
-    --violet:#a855f7;
-    --magenta:#e942e9;
-    --text:#e6edf3;
-    --text-dim:#94a3b8;
-    --mono:'JetBrains Mono', monospace;
-    --sans:'Inter', -apple-system, sans-serif;
-    --radius:16px;
-    --maxw:1180px;
-  }
-
-  *{margin:0;padding:0;box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-
-  body{
-    background:
-      radial-gradient(circle at 15% 0%, rgba(0,255,102,0.07), transparent 40%),
-      radial-gradient(circle at 85% 15%, rgba(168,85,247,0.10), transparent 45%),
-      radial-gradient(circle at 50% 100%, rgba(233,66,233,0.06), transparent 50%),
-      linear-gradient(180deg, var(--bg-deep) 0%, #0e1420 100%);
-    color:var(--text);
-    font-family:var(--sans);
-    line-height:1.6;
-    overflow-x:hidden;
-  }
-
-  a{color:inherit;text-decoration:none;}
-  ul{list-style:none;}
-  img{max-width:100%;display:block;}
-  svg{display:block;}
-  ::selection{background:var(--neon);color:#0b1017;}
-
-  .container{max-width:var(--maxw);margin:0 auto;padding:0 24px;}
-  .icon{width:22px;height:22px;stroke:var(--neon);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
-
-  /* ---------- SCROLL REVEAL ---------- */
-  [data-reveal]{
-    opacity:0;
-    transition:opacity .9s cubic-bezier(.16,.9,.25,1), transform .9s cubic-bezier(.16,.9,.25,1);
-    will-change:transform, opacity;
-  }
-  [data-reveal="left"]{transform:translateX(-90px) scale(.92);}
-  [data-reveal="right"]{transform:translateX(90px) scale(.92);}
-  [data-reveal="top"]{transform:translateY(-70px) scale(.92);}
-  [data-reveal="bottom"]{transform:translateY(70px) scale(.92);}
-  [data-reveal="scale"]{transform:scale(.8);}
-  [data-reveal].is-visible{opacity:1;transform:translate(0,0) scale(1);}
-
-  /* ---------- NAV ---------- */
-  header.nav{
-    position:sticky;top:0;z-index:100;
-    backdrop-filter:blur(14px) saturate(140%);
-    background:rgba(11,16,23,0.72);
-    border-bottom:1px solid var(--card-border);
-  }
-  .nav-inner{
-    display:flex;align-items:center;justify-content:space-between;
-    padding:10px 24px;max-width:var(--maxw);margin:0 auto;
-  }
-  .logo-group{display:flex;align-items:center;gap:12px;}
-  .logo-mark{
-    width:44px;height:44px;border-radius:50%;
-    overflow:hidden;flex-shrink:0;
-    box-shadow:0 0 18px rgba(0,255,102,0.3);
-    border:1px solid rgba(0,255,102,0.25);
-  }
-  .logo-mark img{width:100%;height:100%;object-fit:cover;transform:scale(1.35);}
-  .logo-text{font-family:var(--mono);font-weight:700;font-size:17px;letter-spacing:0.5px;}
-  .logo-text .sub{
-    display:block;font-family:var(--sans);font-weight:400;font-size:10px;
-    color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin-top:-2px;
-  }
-  nav.links{display:flex;gap:32px;align-items:center;}
-  nav.links a{font-size:14px;font-weight:500;color:var(--text-dim);transition:color .2s;}
-  nav.links a:hover{color:var(--neon);}
-  .nav-cta{
-    background:var(--neon);color:#04140a !important;padding:10px 20px;border-radius:10px;
-    font-weight:700;font-size:13px;font-family:var(--mono);
-    box-shadow:0 0 20px rgba(0,255,102,0.25);transition:transform .2s, box-shadow .2s;
-  }
-  .nav-cta:hover{transform:translateY(-2px);box-shadow:0 6px 26px rgba(0,255,102,0.4);}
-  .burger{display:none;background:none;border:none;color:var(--text);font-size:26px;cursor:pointer;}
-
-  @media(max-width:860px){
-    nav.links{
-      position:fixed;top:65px;left:0;right:0;background:rgba(11,16,23,0.98);
-      flex-direction:column;padding:24px;gap:20px;border-bottom:1px solid var(--card-border);
-      transform:translateY(-150%);opacity:0;transition:transform .3s ease, opacity .3s ease;
-    }
-    nav.links.open{transform:translateY(0);opacity:1;}
-    .burger{display:block;}
-  }
-
-  /* ---------- HERO / PORTADA ---------- */
-  .hero{
-    padding:80px 24px 0;
-    position:relative;
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:0;
-    max-width:var(--maxw);
-    margin:0 auto;
-  }
-  @media(max-width:900px){
-    .hero{text-align:center;padding-top:56px;}
-  }
-  .hero::before{
-    content:'';position:absolute;inset:-40px 0 0 0;height:520px;
-    background-image:
-      linear-gradient(rgba(0,255,102,0.035) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,102,0.035) 1px, transparent 1px);
-    background-size:42px 42px;
-    mask-image:radial-gradient(ellipse 60% 60% at 50% 20%, black, transparent);
-    pointer-events:none;
-    z-index:0;
-  }
-  .hero-copy{position:relative;z-index:1;max-width:760px;margin:0 auto 56px;text-align:center;}
-  .eyebrow{
-    display:inline-flex;align-items:center;gap:8px;font-family:var(--mono);font-size:12px;color:var(--neon);
-    background:rgba(0,255,102,0.08);border:1px solid rgba(0,255,102,0.25);padding:6px 14px;
-    border-radius:999px;margin-bottom:24px;letter-spacing:1px;
-  }
-  .eyebrow .dot{width:7px;height:7px;border-radius:50%;background:var(--neon);box-shadow:0 0 8px var(--neon);animation:pulse 1.8s infinite;}
-  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.35;}}
-
-  .hero h1{
-    font-size:clamp(2rem, 4.4vw, 3.6rem);font-weight:800;line-height:1.12;margin-bottom:22px;letter-spacing:-1px;
-  }
-  .hero h1 .grad{
-    background:linear-gradient(90deg, var(--neon), var(--violet) 60%, var(--magenta));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-  }
-  .hero p.tagline{font-size:clamp(1rem, 1.6vw, 1.2rem);color:var(--text-dim);max-width:560px;margin:0 auto 40px;}
-  .hero-ctas{display:flex;gap:16px;flex-wrap:wrap;justify-content:center;}
-
-  .btn-primary{
-    background:var(--neon);color:#04140a;padding:16px 34px;border-radius:12px;font-weight:700;
-    font-family:var(--mono);font-size:15px;border:none;cursor:pointer;
-    box-shadow:0 0 28px rgba(0,255,102,0.3);transition:transform .2s, box-shadow .2s;
-  }
-  .btn-primary:hover{transform:translateY(-3px);box-shadow:0 10px 34px rgba(0,255,102,0.45);}
-  .btn-ghost{
-    padding:16px 30px;border-radius:12px;border:1px solid var(--card-border);color:var(--text);
-    font-weight:600;font-size:15px;background:rgba(255,255,255,0.02);
-    transition:border-color .2s, background .2s;
-  }
-  .btn-ghost:hover{border-color:var(--violet);background:rgba(168,85,247,0.08);}
-
-  .hero-stats{display:flex;gap:44px;flex-wrap:wrap;margin-top:48px;font-family:var(--mono);justify-content:center;}
-  @media(max-width:560px){.hero-stats{gap:22px;}}
-  .stat{min-width:90px;}
-  .stat h3{font-size:1.7rem;color:var(--neon);display:flex;align-items:center;justify-content:center;gap:4px;line-height:1;}
-  .stat h3 .lt{font-size:0.6em;transform:translateY(-1px);}
-  .stat span{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:1px;}
-
-  /* Portada visual */
-  .hero-visual{position:relative;z-index:1;display:flex;justify-content:center;align-items:center;width:100%;margin-bottom:60px;}
-  .hero-visual .ring-bg{
-    position:absolute;width:70%;height:120%;border-radius:50%;
-    background:radial-gradient(circle, rgba(0,255,102,0.12), transparent 65%);
-    filter:blur(6px);
-  }
-  .hero-visual .frame{
-    position:relative;width:100%;aspect-ratio:16/7;border-radius:28px;
-    overflow:hidden;
-    background:rgba(22,33,62,0.55);
-    border:1px solid rgba(0,255,102,0.25);
-    box-shadow:0 30px 70px rgba(0,0,0,0.45), 0 0 60px rgba(0,255,102,0.12);
-  }
-  .hero-visual .frame::after{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(180deg, transparent 65%, rgba(11,16,23,0.5) 100%);
-    pointer-events:none;
-  }
-  .hero-visual .frame img{width:100%;height:100%;object-fit:cover;object-position:center 30%;display:block;}
-  @media(max-width:900px){
-    .hero-visual{margin-bottom:44px;}
-    .hero-visual .frame{aspect-ratio:4/3;border-radius:20px;}
-  }
-  @media(max-width:560px){
-    .hero-visual .frame{aspect-ratio:1/1;}
-  }
-
-  /* ---------- SECTION SHELL ---------- */
-  section{padding:100px 0;position:relative;}
-  .section-head{text-align:center;max-width:640px;margin:0 auto 56px;}
-  .section-head .tag{
-    font-family:var(--mono);font-size:12px;color:var(--violet);
-    letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:12px;
-  }
-  .section-head h2{font-size:clamp(1.7rem,3.5vw,2.5rem);font-weight:800;letter-spacing:-0.5px;}
-  .section-head p{color:var(--text-dim);margin-top:14px;font-size:1rem;}
-
-  /* ---------- QUIÉNES SOMOS ---------- */
-  .about-wrap{
-    display:grid;grid-template-columns:0.85fr 1.15fr;gap:56px;align-items:center;
-  }
-  @media(max-width:900px){.about-wrap{grid-template-columns:1fr;}}
-  .about-visual{
-    position:relative;border-radius:24px;overflow:hidden;
-    border:1px solid var(--card-border);
-    background:rgba(22,33,62,0.5);
-    display:flex;align-items:center;justify-content:center;
-    padding:44px;
-  }
-  .about-visual img{border-radius:16px;}
-  .about-text h3{font-size:1.5rem;font-weight:800;margin-bottom:20px;line-height:1.3;}
-  .about-text p{color:var(--text-dim);margin-bottom:18px;font-size:0.98rem;line-height:1.75;}
-  .about-text p.lead{color:var(--text);font-size:1.06rem;}
-  .about-text p.lead strong{color:var(--neon);font-weight:700;}
-  .about-pillars{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:28px;}
-  @media(max-width:520px){.about-pillars{grid-template-columns:1fr;}}
-  .pillar{
-    display:flex;gap:12px;align-items:flex-start;
-    background:rgba(45,55,72,0.35);border:1px solid var(--card-border);border-radius:12px;padding:16px;
-  }
-  .pillar .icon{flex-shrink:0;margin-top:2px;}
-  .pillar h5{font-size:0.9rem;font-weight:700;margin-bottom:4px;}
-  .pillar p{font-size:0.8rem;color:var(--text-dim);margin:0;}
-
-  /* ---------- SERVICIOS ---------- */
-  .services-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(280px, 1fr));gap:24px;}
-  .service-card{
-    background:rgba(45,55,72,0.45);backdrop-filter:blur(10px);border:1px solid var(--card-border);
-    border-radius:var(--radius);padding:30px 26px;position:relative;overflow:hidden;
-    transition:transform .3s, border-color .3s, box-shadow .3s;
-  }
-  .service-card::before{
-    content:'';position:absolute;inset:0;
-    background:linear-gradient(135deg, rgba(0,255,102,0.08), transparent 60%);
-    opacity:0;transition:opacity .3s;
-  }
-  .service-card:hover{
-    transform:translateY(-6px);border-color:rgba(0,255,102,0.4);
-    box-shadow:0 18px 40px rgba(0,0,0,0.35), 0 0 30px rgba(0,255,102,0.08);
-  }
-  .service-card:hover::before{opacity:1;}
-  .service-icon{
-    width:50px;height:50px;border-radius:12px;background:rgba(0,255,102,0.08);
-    border:1px solid rgba(0,255,102,0.25);display:flex;align-items:center;justify-content:center;
-    margin-bottom:20px;position:relative;z-index:1;
-  }
-  .service-card h3{font-size:1.1rem;font-weight:700;margin-bottom:10px;position:relative;z-index:1;}
-  .service-card p{color:var(--text-dim);font-size:0.9rem;position:relative;z-index:1;}
-
-  /* Banner de precio global */
-  .price-banner{
-    margin-top:40px;
-    display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;
-    background:linear-gradient(120deg, rgba(0,255,102,0.08), rgba(168,85,247,0.08));
-    border:1px solid rgba(0,255,102,0.25);
-    border-radius:var(--radius);
-    padding:28px 34px;
-  }
-  .price-banner .label{font-family:var(--mono);font-size:12px;color:var(--text-dim);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px;}
-  .price-banner .value{font-family:var(--mono);font-size:1.8rem;font-weight:700;color:var(--neon);}
-  .price-banner .value span{color:var(--text-dim);font-size:0.95rem;font-weight:500;margin-left:6px;}
-  .price-banner p{color:var(--text-dim);font-size:0.88rem;max-width:360px;}
-
-  /* ---------- PROCESO ---------- */
-  .why-grid{display:grid;grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));gap:20px;}
-  .why-item{text-align:center;padding:26px 16px;}
-  .why-item .num{
-    font-family:var(--mono);font-size:2.2rem;font-weight:800;
-    background:linear-gradient(90deg, var(--neon), var(--violet));
-    -webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:8px;
-  }
-  .why-item h4{font-size:0.95rem;font-weight:700;margin-bottom:8px;}
-  .why-item p{font-size:0.85rem;color:var(--text-dim);}
-
-  /* ---------- CONTACTO ---------- */
-  .contact-wrap{display:grid;grid-template-columns:0.9fr 1.3fr;gap:40px;align-items:start;}
-  @media(max-width:860px){.contact-wrap{grid-template-columns:1fr;}}
-
-  .contact-info{
-    background:rgba(22,33,62,0.6);border:1px solid var(--card-border);border-radius:var(--radius);padding:34px;
-    position:sticky;top:90px;
-  }
-  @media(max-width:860px){.contact-info{position:static;}}
-  .contact-info h3{font-size:1.3rem;margin-bottom:14px;}
-  .contact-info p{color:var(--text-dim);font-size:0.92rem;margin-bottom:26px;}
-  .contact-line{display:flex;align-items:center;gap:12px;margin-bottom:16px;font-family:var(--mono);font-size:0.85rem;word-break:break-word;}
-  .contact-line .ic{
-    width:34px;height:34px;border-radius:8px;background:rgba(0,255,102,0.08);
-    border:1px solid rgba(0,255,102,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;
-  }
-  .contact-line .ic .icon{width:16px;height:16px;}
-
-  .next-steps{margin-top:28px;padding-top:26px;border-top:1px solid var(--card-border);}
-  .next-steps h4{font-size:0.8rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:16px;}
-  .next-steps ol{list-style:none;display:flex;flex-direction:column;gap:12px;}
-  .next-steps li{display:flex;gap:12px;align-items:flex-start;font-size:0.85rem;color:var(--text-dim);}
-  .next-steps .step-n{
-    flex-shrink:0;width:22px;height:22px;border-radius:50%;background:rgba(0,255,102,0.1);
-    border:1px solid rgba(0,255,102,0.3);color:var(--neon);font-family:var(--mono);font-size:0.7rem;
-    display:flex;align-items:center;justify-content:center;font-weight:700;
-  }
-
-  .terminal-tag{
-    margin-top:26px;font-family:var(--mono);font-size:0.78rem;color:var(--neon);
-    background:rgba(0,0,0,0.35);border:1px solid rgba(0,255,102,0.2);border-radius:10px;
-    padding:14px 16px;line-height:1.7;
-  }
-  .terminal-tag .prompt{color:var(--violet);}
-
-  form.contact-form{
-    background:rgba(45,55,72,0.45);backdrop-filter:blur(10px);border:1px solid var(--card-border);
-    border-radius:var(--radius);padding:36px;display:flex;flex-direction:column;gap:20px;
-  }
-  .form-title{font-size:1rem;font-weight:700;margin-bottom:-4px;}
-  .form-sub{font-size:0.85rem;color:var(--text-dim);margin-bottom:6px;}
-  .field{display:flex;flex-direction:column;gap:8px;}
-  .field label{font-size:0.82rem;font-weight:600;color:var(--text-dim);}
-  .field-input{position:relative;display:flex;align-items:center;}
-  .field-input .icon{
-    position:absolute;left:14px;width:17px;height:17px;stroke:var(--text-dim);pointer-events:none;
-    transition:stroke .2s;
-  }
-  .field-input input:focus + .icon,
-  .field-input select:focus + .icon{stroke:var(--neon);}
-  .field input, .field select, .field textarea{
-    width:100%;background:rgba(11,16,23,0.6);border:1px solid var(--card-border);border-radius:10px;
-    padding:13px 14px;color:var(--text);font-family:var(--sans);font-size:0.92rem;outline:none;
-    transition:border-color .2s, box-shadow .2s;
-  }
-  .field-input input, .field-input select{padding-left:42px;}
-  .field input:focus, .field select:focus, .field textarea:focus{
-    border-color:var(--neon);box-shadow:0 0 0 3px rgba(0,255,102,0.12);
-  }
-  .field textarea{resize:vertical;min-height:120px;}
-  .field select{cursor:pointer;appearance:none;-webkit-appearance:none;}
-  .field-input::after{
-    content:'';position:absolute;right:16px;width:8px;height:8px;
-    border-right:1.5px solid var(--text-dim);border-bottom:1.5px solid var(--text-dim);
-    transform:rotate(45deg);pointer-events:none;
-  }
-  .field-input:has(input)::after{display:none;}
-  .row2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
-  @media(max-width:540px){.row2{grid-template-columns:1fr;}}
-
-  .submit-btn{
-    display:flex;align-items:center;justify-content:center;gap:10px;
-    background:var(--neon);color:#04140a;border:none;border-radius:10px;padding:16px;
-    font-family:var(--mono);font-weight:700;font-size:0.95rem;cursor:pointer;
-    transition:transform .2s, box-shadow .2s, opacity .2s;box-shadow:0 0 22px rgba(0,255,102,0.25);
-  }
-  .submit-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,255,102,0.4);}
-  .submit-btn:disabled{opacity:0.6;cursor:not-allowed;transform:none;}
-  .submit-btn .spinner{
-    display:none;width:15px;height:15px;border-radius:50%;
-    border:2px solid rgba(4,20,10,0.3);border-top-color:#04140a;animation:spin-btn .7s linear infinite;
-  }
-  .submit-btn.loading .spinner{display:inline-block;}
-  @keyframes spin-btn{to{transform:rotate(360deg);}}
-
-  .form-note{display:flex;align-items:center;gap:8px;font-size:0.76rem;color:var(--text-dim);}
-  .form-note .icon{width:14px;height:14px;stroke:var(--text-dim);flex-shrink:0;}
-
-  .form-msg{
-    font-family:var(--mono);font-size:0.85rem;padding:14px 16px;border-radius:10px;display:none;
-    align-items:flex-start;gap:10px;line-height:1.5;
-  }
-  .form-msg .icon{flex-shrink:0;width:18px;height:18px;margin-top:1px;}
-  .form-msg.show{display:flex;}
-  .form-msg.success{background:rgba(0,255,102,0.08);border:1px solid rgba(0,255,102,0.3);color:var(--neon);}
-  .form-msg.success .icon{stroke:var(--neon);}
-  .form-msg.error{background:rgba(233,66,66,0.08);border:1px solid rgba(233,66,66,0.3);color:#ff6b6b;}
-  .form-msg.error .icon{stroke:#ff6b6b;}
-  .hp-field{position:absolute;left:-9999px;opacity:0;}
-
-  /* ---------- FOOTER ---------- */
-  footer{border-top:1px solid var(--card-border);padding:56px 0 30px;background:rgba(6,9,14,0.6);}
-  .footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:40px;}
-  @media(max-width:700px){.footer-grid{grid-template-columns:1fr;}}
-  .footer-brand .logo-group{margin-bottom:14px;}
-  .footer-brand p{color:var(--text-dim);font-size:0.88rem;max-width:340px;}
-  .footer-col h5{font-size:0.82rem;text-transform:uppercase;letter-spacing:1.5px;color:var(--text-dim);margin-bottom:16px;}
-  .footer-col ul li{margin-bottom:10px;}
-  .footer-col ul li a{font-size:0.88rem;color:var(--text);transition:color .2s;}
-  .footer-col ul li a:hover{color:var(--neon);}
-  .footer-rate{
-    font-family:var(--mono);font-size:0.78rem;color:var(--neon);background:rgba(0,255,102,0.06);
-    border:1px solid rgba(0,255,102,0.2);padding:8px 14px;border-radius:8px;display:inline-block;margin-top:6px;
-  }
-  .footer-bottom{
-    border-top:1px solid var(--card-border);padding-top:24px;display:flex;justify-content:space-between;
-    flex-wrap:wrap;gap:12px;font-size:0.8rem;color:var(--text-dim);font-family:var(--mono);
-  }
-
-  .glow-divider{
-    height:1px;background:linear-gradient(90deg, transparent, rgba(0,255,102,0.4), transparent);
-    margin:0 auto;max-width:var(--maxw);
-  }
-</style>
+<link rel="preload" href="fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script src="app.js"></script>
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"ProfessionalService","name":"CYBER-AD","description":"Ciberseguridad freelance: hardening, Defender, Intune, auditoría y análisis forense.","email":"contacto@cyber-ad.dev","areaServed":["ES","EU"],"priceRange":"30-60 EUR/hora"}
+</script>
 </head>
 <body>
+<a class="skip" href="#main">Saltar al contenido</a>
 
 <header class="nav">
   <div class="nav-inner">
     <div class="logo-group">
-      <div class="logo-mark"><img src="cyber-ad-logo.png" alt="Logotipo CYBER-AD"></div>
+      <div class="logo-mark"><img src="cyber-ad-logo.png" alt="Logotipo CYBER-AD" width="44" height="44"></div>
       <div class="logo-text">CYBER-AD<span class="sub">Ciberdefensa Activa</span></div>
     </div>
-    <nav class="links" id="navLinks">
+    <nav class="links" id="navLinks" aria-label="Principal">
       <a href="#nosotros">Quiénes somos</a>
       <a href="#servicios">Servicios</a>
       <a href="#proceso">Proceso</a>
       <a href="#contacto">Contacto</a>
       <a href="#contacto" class="nav-cta">Solicitar auditoría</a>
     </nav>
-    <button class="burger" id="burgerBtn" aria-label="Abrir menú">☰</button>
+    <button class="burger" id="burgerBtn" type="button" aria-label="Abrir menú" aria-expanded="false" aria-controls="navLinks">☰</button>
   </div>
 </header>
 
-<main>
-  <!-- HERO / PORTADA -->
+<main id="main">
   <section class="hero">
     <div class="hero-copy">
       <div class="eyebrow"><span class="dot"></span> DEFENSA ACTIVA · DISPONIBLE PARA NUEVOS PROYECTOS</div>
@@ -470,77 +56,49 @@
         <a href="#servicios" class="btn-ghost">Ver servicios</a>
       </div>
       <div class="hero-stats">
-        <div class="stat"><h3><span class="count" data-target="100" data-suffix="%">0%</span></h3><span>Remoto / freelance</span></div>
-        <div class="stat"><h3><span class="lt">&lt;</span><span class="count" data-target="24" data-suffix="h">0h</span></h3><span>Primera respuesta</span></div>
-        <div class="stat"><h3><span class="count" data-target="360" data-suffix="°">0°</span></h3><span>Defensa integral</span></div>
+        <div class="stat"><h3><span class="count" data-target="100" data-suffix="%">100%</span></h3><span class="lbl">Remoto / freelance</span></div>
+        <div class="stat"><h3><span class="lt">&lt;</span><span class="count" data-target="24" data-suffix="h">24h</span></h3><span class="lbl">Primera respuesta</span></div>
+        <div class="stat"><h3><span class="count" data-target="360" data-suffix="°">360°</span></h3><span class="lbl">Defensa integral</span></div>
       </div>
     </div>
     <div class="hero-visual">
       <div class="ring-bg"></div>
-      <div class="frame"><img src="cyber-ad-office.png" alt="Equipo CYBER-AD monitorizando alertas de seguridad"></div>
+      <div class="frame"><img src="cyber-ad-office.png" alt="Equipo CYBER-AD monitorizando alertas de seguridad" width="1600" height="700" fetchpriority="high"></div>
     </div>
   </section>
 
   <div class="glow-divider"></div>
 
-  <!-- QUIÉNES SOMOS -->
   <section id="nosotros">
     <div class="container about-wrap">
       <div class="about-visual" data-reveal="left">
-        <svg viewBox="0 0 320 320" width="100%" style="max-width:280px;">
-          <defs>
-            <radialGradient id="radarGlow" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stop-color="#00ff66" stop-opacity="0.35"/>
-              <stop offset="100%" stop-color="#00ff66" stop-opacity="0"/>
-            </radialGradient>
-          </defs>
+        <svg viewBox="0 0 320 320" role="img" aria-label="Radar de defensa con escudo central">
+          <defs><radialGradient id="radarGlow" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#00ff66" stop-opacity="0.35"/><stop offset="100%" stop-color="#00ff66" stop-opacity="0"/></radialGradient></defs>
           <circle cx="160" cy="160" r="140" fill="url(#radarGlow)"/>
-          <circle cx="160" cy="160" r="120" fill="none" stroke="#00ff66" stroke-opacity="0.25" stroke-width="1"/>
-          <circle cx="160" cy="160" r="85" fill="none" stroke="#00ff66" stroke-opacity="0.3" stroke-width="1"/>
-          <circle cx="160" cy="160" r="50" fill="none" stroke="#00ff66" stroke-opacity="0.35" stroke-width="1"/>
+          <circle cx="160" cy="160" r="120" fill="none" stroke="#00ff66" stroke-opacity="0.25"/>
+          <circle cx="160" cy="160" r="85" fill="none" stroke="#00ff66" stroke-opacity="0.3"/>
+          <circle cx="160" cy="160" r="50" fill="none" stroke="#00ff66" stroke-opacity="0.35"/>
           <line x1="160" y1="20" x2="160" y2="300" stroke="#00ff66" stroke-opacity="0.15"/>
           <line x1="20" y1="160" x2="300" y2="160" stroke="#00ff66" stroke-opacity="0.15"/>
-          <g stroke="#a855f7" stroke-width="1.4" stroke-linecap="round" opacity="0.85">
-            <path d="M160 160 L100 95"/>
-            <path d="M160 160 L235 110"/>
-            <path d="M160 160 L215 230"/>
-            <path d="M160 160 L95 220"/>
-          </g>
-          <g fill="#0b1017" stroke="#00ff66" stroke-width="1.5">
-            <circle cx="100" cy="95" r="7"/>
-            <circle cx="235" cy="110" r="7"/>
-            <circle cx="215" cy="230" r="7"/>
-            <circle cx="95" cy="220" r="7"/>
-          </g>
+          <g stroke="#a855f7" stroke-width="1.4" stroke-linecap="round" opacity="0.85"><path d="M160 160 L100 95"/><path d="M160 160 L235 110"/><path d="M160 160 L215 230"/><path d="M160 160 L95 220"/></g>
+          <g fill="#0b1017" stroke="#00ff66" stroke-width="1.5"><circle cx="100" cy="95" r="7"/><circle cx="235" cy="110" r="7"/><circle cx="215" cy="230" r="7"/><circle cx="95" cy="220" r="7"/></g>
           <circle cx="160" cy="160" r="10" fill="#00ff66"/>
           <path d="M160 128l19 8v16c0 12-8 21-19 24-11-3-19-12-19-24v-16z" fill="#0b1017" stroke="#39FF14" stroke-width="2"/>
           <path d="M152 160l5 5 11-11" stroke="#39FF14" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div class="about-text" data-reveal="right">
-        <span class="tag" style="font-family:var(--mono);font-size:12px;color:var(--violet);letter-spacing:2px;text-transform:uppercase;display:block;margin-bottom:12px;">// quiénes somos</span>
-        <h3>Un operador freelance dedicado a la defensa activa</h3>
+        <span class="tag">// quiénes somos</span>
+        <h2>Un operador freelance dedicado a la defensa activa</h2>
         <p class="lead"><strong>CYBER-AD</strong> es un proyecto freelance de ciberseguridad especializado en defensa digital activa.</p>
-        <p>Nos dedicamos a proteger infraestructuras Windows y entornos Microsoft 365 frente a amenazas reales, combinando hardening, monitorización y respuesta ante incidentes.</p>
-        <p>Trabajamos de forma cercana y directa con pymes, equipos técnicos y profesionales que necesitan reforzar su seguridad sin la complejidad ni el coste de una gran consultora.</p>
-        <p>Nuestro propósito es simple: que la seguridad deje de ser una preocupación y se convierta en una base sólida sobre la que construir.</p>
+        <p>Me dedico a proteger infraestructuras Windows y entornos Microsoft 365 frente a amenazas reales, combinando hardening, monitorización y respuesta ante incidentes.</p>
+        <p>Trabajo de forma cercana y directa con pymes, equipos técnicos y profesionales que necesitan reforzar su seguridad sin la complejidad ni el coste de una gran consultora.</p>
+        <p>Mi propósito es simple: que la seguridad deje de ser una preocupación y se convierta en una base sólida sobre la que construir.</p>
         <div class="about-pillars">
-          <div class="pillar">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-            <div><h5>Protección real</h5><p>Medidas aplicadas sobre tu infraestructura, no informes genéricos.</p></div>
-          </div>
-          <div class="pillar">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
-            <div><h5>Respuesta ágil</h5><p>Disponibilidad rápida y comunicación directa en cada proyecto.</p></div>
-          </div>
-          <div class="pillar">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/></svg>
-            <div><h5>Transparencia</h5><p>Informes claros de cada hallazgo, acción y recomendación.</p></div>
-          </div>
-          <div class="pillar">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg>
-            <div><h5>Compromiso</h5><p>La seguridad de tu negocio, tratada como si fuera la nuestra.</p></div>
-          </div>
+          <div class="pillar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg><div><h3>Protección real</h3><p>Medidas aplicadas sobre tu infraestructura, no informes genéricos.</p></div></div>
+          <div class="pillar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><div><h3>Respuesta ágil</h3><p>Disponibilidad rápida y comunicación directa en cada proyecto.</p></div></div>
+          <div class="pillar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 19V5a2 2 0 0 1 2-2h9l5 5v11a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M14 3v5h5"/></svg><div><h3>Transparencia</h3><p>Informes claros de cada hallazgo, acción y recomendación.</p></div></div>
+          <div class="pillar"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></svg><div><h3>Compromiso</h3><p>La seguridad de tu negocio, tratada como si fuera la mía.</p></div></div>
         </div>
       </div>
     </div>
@@ -548,7 +106,6 @@
 
   <div class="glow-divider"></div>
 
-  <!-- SERVICIOS -->
   <section id="servicios">
     <div class="container">
       <div class="section-head" data-reveal="top">
@@ -557,195 +114,114 @@
         <p>Endurecimiento, monitorización y respuesta ante amenazas, adaptados a entornos Windows y Microsoft 365 / Intune.</p>
       </div>
       <div class="services-grid">
-
-        <div class="service-card" data-reveal="left">
-          <div class="service-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div>
-          <h3>Hardening de Windows</h3>
-          <p>Endurecimiento de sistemas Windows: reducción de superficie de ataque, políticas GPO, servicios y configuraciones seguras.</p>
-        </div>
-
-        <div class="service-card" data-reveal="right">
-          <div class="service-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/></svg></div>
-          <h3>Configuración de Defender</h3>
-          <p>Puesta a punto de Microsoft Defender for Endpoint: reglas ASR, exclusiones, detección y respuesta automatizada.</p>
-        </div>
-
-        <div class="service-card" data-reveal="left">
-          <div class="service-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div>
-          <h3>Revisión de políticas de Intune</h3>
-          <p>Auditoría y optimización de perfiles de configuración, cumplimiento y despliegue en Microsoft Intune.</p>
-        </div>
-
-        <div class="service-card" data-reveal="right">
-          <div class="service-icon"><svg class="icon" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
-          <h3>Auditoría de seguridad básica</h3>
-          <p>Revisión del estado de seguridad de tu infraestructura con informe de hallazgos y recomendaciones priorizadas.</p>
-        </div>
-
-        <div class="service-card" data-reveal="left">
-          <div class="service-icon"><svg class="icon" viewBox="0 0 24 24"><path d="M9 3a3 3 0 0 1 6 0M12 6v14M6 10h12M5 14h14M7 18h10"/><circle cx="12" cy="6" r="2"/></svg></div>
-          <h3>Detección de malware</h3>
-          <p>Identificación y contención de artefactos maliciosos mediante análisis de indicadores y telemetría de endpoint.</p>
-        </div>
-
-        <div class="service-card" data-reveal="right">
-          <div class="service-icon"><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h4v4H8zM8 16h8M16 8h.01"/></svg></div>
-          <h3>Análisis forense básico</h3>
-          <p>Reconstrucción de incidentes: línea temporal, artefactos comprometidos y evidencia para la toma de decisiones.</p>
-        </div>
-
+        <div class="service-card" data-reveal="left"><div class="service-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/><path d="M9 12l2 2 4-4"/></svg></div><h3>Hardening de Windows</h3><p>Endurecimiento de sistemas Windows: reducción de superficie de ataque, políticas GPO, servicios y configuraciones seguras.</p></div>
+        <div class="service-card" data-reveal="right"><div class="service-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2"/></svg></div><h3>Configuración de Defender</h3><p>Puesta a punto de Microsoft Defender for Endpoint: reglas ASR, exclusiones, detección y respuesta automatizada.</p></div>
+        <div class="service-card" data-reveal="left"><div class="service-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M9 8h6M9 12h6M9 16h4"/></svg></div><h3>Revisión de políticas de Intune</h3><p>Auditoría y optimización de perfiles de configuración, cumplimiento y despliegue en Microsoft Intune.</p></div>
+        <div class="service-card" data-reveal="right"><div class="service-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div><h3>Auditoría de seguridad básica</h3><p>Revisión del estado de seguridad de tu infraestructura con informe de hallazgos y recomendaciones priorizadas.</p></div>
+        <div class="service-card" data-reveal="left"><div class="service-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3a3 3 0 0 1 6 0M12 6v14M6 10h12M5 14h14M7 18h10"/><circle cx="12" cy="6" r="2"/></svg></div><h3>Detección de malware</h3><p>Identificación y contención de artefactos maliciosos mediante análisis de indicadores y telemetría de endpoint.</p></div>
+        <div class="service-card" data-reveal="right"><div class="service-icon"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h4v4H8zM8 16h8M16 8h.01"/></svg></div><h3>Análisis forense básico</h3><p>Reconstrucción de incidentes: línea temporal, artefactos comprometidos y evidencia para la toma de decisiones.</p></div>
       </div>
-
       <div class="price-banner" data-reveal="scale">
         <div>
-          <div class="label">Tarifa profesional única</div>
-          <div class="value">30–60 € <span>/ hora, según alcance y complejidad</span></div>
+          <div class="label">Tarifa profesional</div>
+          <div class="value">30–60 € <span>/ hora + IVA, según alcance y complejidad</span></div>
         </div>
-        <p>Un único precio para todos los servicios del catálogo. La tarifa final se ajusta tras el diagnóstico inicial, sin sorpresas.</p>
+        <p>Misma tarifa base para todos los servicios del catálogo. El precio final se ajusta tras el diagnóstico inicial, sin sorpresas.</p>
       </div>
     </div>
   </section>
 
-  <!-- PROCESO -->
-  <section id="proceso" style="background:rgba(22,33,62,0.35);">
+  <section id="proceso">
     <div class="container">
       <div class="section-head" data-reveal="top">
         <span class="tag">// metodología</span>
-        <h2>Cómo trabajamos</h2>
+        <h2>Cómo trabajo</h2>
         <p>Un proceso claro, directo y sin fricciones, pensado para empresas y equipos técnicos.</p>
       </div>
       <div class="why-grid">
-        <div class="why-item" data-reveal="bottom">
-          <div class="num">01</div>
-          <h4>Contacto inicial</h4>
-          <p>Cuéntanos tu caso a través del formulario o correo. Respuesta en menos de 24h.</p>
-        </div>
-        <div class="why-item" data-reveal="bottom">
-          <div class="num">02</div>
-          <h4>Diagnóstico</h4>
-          <p>Evaluamos el alcance y definimos el servicio y las horas estimadas.</p>
-        </div>
-        <div class="why-item" data-reveal="bottom">
-          <div class="num">03</div>
-          <h4>Ejecución</h4>
-          <p>Trabajo remoto sobre tu infraestructura, con comunicación continua.</p>
-        </div>
-        <div class="why-item" data-reveal="bottom">
-          <div class="num">04</div>
-          <h4>Informe final</h4>
-          <p>Entrega de resultados, evidencias y recomendaciones documentadas.</p>
-        </div>
+        <div class="why-item" data-reveal="bottom"><div class="num">01</div><h3>Contacto inicial</h3><p>Cuéntame tu caso a través del formulario o por correo.</p></div>
+        <div class="why-item" data-reveal="bottom"><div class="num">02</div><h3>Diagnóstico</h3><p>Evalúo el alcance y defino el servicio y las horas estimadas.</p></div>
+        <div class="why-item" data-reveal="bottom"><div class="num">03</div><h3>Ejecución</h3><p>Trabajo remoto sobre tu infraestructura, con comunicación continua.</p></div>
+        <div class="why-item" data-reveal="bottom"><div class="num">04</div><h3>Informe final</h3><p>Entrega de resultados, evidencias y recomendaciones documentadas.</p></div>
       </div>
     </div>
   </section>
 
-  <!-- CONTACTO -->
   <section id="contacto">
     <div class="container">
       <div class="section-head" data-reveal="top">
         <span class="tag">// contacto</span>
         <h2>Hablemos de tu seguridad</h2>
-        <p>Sin fricción, sin compromisos. Cuéntanos qué necesitas y te responderemos lo antes posible.</p>
+        <p>Sin fricción, sin compromisos. Cuéntame qué necesitas y te responderé lo antes posible.</p>
       </div>
-
       <div class="contact-wrap">
         <div class="contact-info" data-reveal="left">
           <h3>Canal directo</h3>
-          <p>También puedes escribirnos directamente o revisar nuestra disponibilidad actual.</p>
-
-          <div class="contact-line">
-            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
-            <span>contacto@cyber-ad.dev</span>
-          </div>
-          <div class="contact-line">
-            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-6-4-9s1.5-6.5 4-9z"/></svg></div>
-            <span>100% remoto · España / UE</span>
-          </div>
-          <div class="contact-line">
-            <div class="ic"><svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>
-            <span>Respuesta &lt; 24h laborables</span>
-          </div>
-
+          <p>También puedes escribirme directamente.</p>
+          <div class="contact-line"><div class="ic"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><a href="mailto:contacto@cyber-ad.dev">contacto@cyber-ad.dev</a></div>
+          <div class="contact-line"><div class="ic"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.5 4 6 4 9s-1.5 6.5-4 9c-2.5-2.5-4-6-4-9s1.5-6.5 4-9z"/></svg></div><span>100% remoto · España / UE</span></div>
+          <div class="contact-line"><div class="ic"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div><span>Respuesta &lt; 24h laborables</span></div>
           <div class="next-steps">
             <h4>Qué pasa después</h4>
             <ol>
-              <li><span class="step-n">1</span> Recibimos tu solicitud al instante.</li>
-              <li><span class="step-n">2</span> Te respondemos en menos de 24h laborables.</li>
+              <li><span class="step-n">1</span> Recibo tu solicitud al instante.</li>
+              <li><span class="step-n">2</span> Te respondo en menos de 24h laborables.</li>
               <li><span class="step-n">3</span> Acordamos alcance, horas y siguiente paso.</li>
             </ol>
           </div>
-
-          <div class="terminal-tag">
-            <span class="prompt">$</span> estado_actual<br>
-            &gt; Disponible para nuevos proyectos<br>
-            <span class="prompt">$</span> tiempo_de_respuesta<br>
-            &gt; Menos de 24h laborables
-          </div>
+          <div class="terminal-tag"><span class="prompt">$</span> estado_actual<br>&gt; Disponible para nuevos proyectos</div>
         </div>
 
         <form class="contact-form" id="contactForm" action="https://formspree.io/f/mkjnozqo" method="POST" data-reveal="right">
-          <!-- Honeypot anti-spam -->
-          <input type="text" name="_gotcha" class="hp-field" tabindex="-1" autocomplete="off">
-
-          <div class="form-title">Cuéntanos tu proyecto</div>
+          <input type="text" name="_gotcha" class="hp-field" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="form-title">Cuéntame tu proyecto</div>
           <div class="form-sub">Todos los campos marcados con * son obligatorios.</div>
-
           <div class="row2">
             <div class="field">
               <label for="nombre">Nombre / Empresa *</label>
-              <div class="field-input">
-                <input type="text" id="nombre" name="nombre" placeholder="Tu nombre o empresa" required>
-                <svg class="icon" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="4"/></svg>
-              </div>
+              <div class="field-input"><input type="text" id="nombre" name="nombre" placeholder="Tu nombre o empresa" autocomplete="name" required><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21a8 8 0 0 0-16 0"/><circle cx="12" cy="8" r="4"/></svg></div>
             </div>
             <div class="field">
               <label for="email">Correo electrónico *</label>
-              <div class="field-input">
-                <input type="email" id="email" name="email" placeholder="tu@empresa.com" required>
-                <svg class="icon" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
-              </div>
+              <div class="field-input"><input type="email" id="email" name="email" placeholder="tu@empresa.com" autocomplete="email" required><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div>
             </div>
           </div>
-
           <div class="field">
             <label for="servicio">Servicio de interés *</label>
             <div class="field-input">
               <select id="servicio" name="servicio" required>
                 <option value="" disabled selected>Selecciona un servicio</option>
-                <option value="Hardening de Windows">Hardening de Windows</option>
-                <option value="Configuración de Defender">Configuración de Defender</option>
-                <option value="Revisión de políticas de Intune">Revisión de políticas de Intune</option>
-                <option value="Auditoría de seguridad básica">Auditoría de seguridad básica</option>
-                <option value="Detección de malware">Detección de malware</option>
-                <option value="Análisis forense básico">Análisis forense básico</option>
-                <option value="Otro / Consulta general">Otro / Consulta general</option>
+                <option>Hardening de Windows</option>
+                <option>Configuración de Defender</option>
+                <option>Revisión de políticas de Intune</option>
+                <option>Auditoría de seguridad básica</option>
+                <option>Detección de malware</option>
+                <option>Análisis forense básico</option>
+                <option>Otro / Consulta general</option>
               </select>
-              <svg class="icon" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
             </div>
           </div>
-
           <div class="field">
             <label for="mensaje">Mensaje *</label>
-            <textarea id="mensaje" name="mensaje" placeholder="Cuéntanos brevemente tu caso, entorno e infraestructura..." required></textarea>
+            <textarea id="mensaje" name="mensaje" placeholder="Cuéntame brevemente tu caso, entorno e infraestructura..." required></textarea>
           </div>
-
-          <button type="submit" class="submit-btn" id="submitBtn">
-            <span class="spinner"></span>
-            <span class="btn-label">&gt; Enviar_Solicitud()</span>
-          </button>
-
+          <label class="consent">
+            <input type="checkbox" name="acepta_privacidad" value="si" required>
+            <span>He leído y acepto la <a href="privacidad.html">política de privacidad</a>. *</span>
+          </label>
+          <button type="submit" class="submit-btn" id="submitBtn"><span class="spinner"></span><span class="btn-label">&gt; Enviar_Solicitud()</span></button>
           <div class="form-note">
-            <svg class="icon" viewBox="0 0 24 24"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/></svg>
-            Tus datos solo se usan para responder a tu solicitud. Nunca se comparten con terceros.
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l7 3v6c0 4.5-3 8-7 9-4-1-7-4.5-7-9V6z"/></svg>
+            Tus datos se usan solo para responder a tu solicitud y se procesan a través de Formspree.
           </div>
-
-          <div class="form-msg success" id="successMsg">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
-            <span>Mensaje enviado correctamente. Te responderemos en menos de 24h.</span>
+          <div class="form-msg success" id="successMsg" role="status">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>
+            <span>Mensaje enviado correctamente. Te responderé en menos de 24h laborables.</span>
           </div>
-          <div class="form-msg error" id="errorMsg">
-            <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
-            <span>No se ha podido enviar el formulario. Inténtalo de nuevo o escribe a contacto@cyber-ad.dev.</span>
+          <div class="form-msg error" id="errorMsg" role="alert">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+            <span>No se pudo enviar el mensaje. Inténtalo de nuevo o escribe a contacto@cyber-ad.dev.</span>
           </div>
         </form>
       </div>
@@ -758,156 +234,30 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="logo-group">
-          <div class="logo-mark"><img src="cyber-ad-logo.png" alt="Logotipo CYBER-AD"></div>
+          <div class="logo-mark"><img src="cyber-ad-logo.png" alt="" width="44" height="44" loading="lazy"></div>
           <div class="logo-text">CYBER-AD<span class="sub">Ciberdefensa Activa</span></div>
         </div>
         <p>Operador freelance de ciberseguridad especializado en defensa activa, hardening y respuesta a incidentes para pymes y equipos técnicos.</p>
-        <div class="footer-rate">Tarifa profesional: 30–60 € / hora</div>
+        <div class="footer-rate">Tarifa profesional: 30–60 € / hora + IVA</div>
       </div>
-
       <div class="footer-col">
-        <h5>Enlaces rápidos</h5>
-        <ul>
-          <li><a href="#nosotros">Quiénes somos</a></li>
-          <li><a href="#servicios">Servicios</a></li>
-          <li><a href="#proceso">Proceso</a></li>
-          <li><a href="#contacto">Contacto</a></li>
-        </ul>
+        <h2>Enlaces rápidos</h2>
+        <ul><li><a href="#nosotros">Quiénes somos</a></li><li><a href="#servicios">Servicios</a></li><li><a href="#proceso">Proceso</a></li><li><a href="#contacto">Contacto</a></li></ul>
       </div>
-
       <div class="footer-col">
-        <h5>Legal</h5>
-        <ul>
-          <li><a href="#">Aviso legal</a></li>
-          <li><a href="#">Política de privacidad</a></li>
-          <li><a href="#">Condiciones del servicio</a></li>
-        </ul>
+        <h2>Legal</h2>
+        <ul><li><a href="aviso-legal.html">Aviso legal</a></li><li><a href="privacidad.html">Política de privacidad</a></li><li><a href="condiciones.html">Condiciones del servicio</a></li></ul>
       </div>
     </div>
-
     <div class="footer-bottom">
-      <span>© 2030 CYBER-AD — Operador freelance independiente.</span>
+      <span>© 2026 CYBER-AD — Operador freelance independiente.</span>
       <span>Diseñado para defender lo que importa.</span>
     </div>
   </div>
 </footer>
 
-<script>
-  // Menú móvil
-  const burgerBtn = document.getElementById('burgerBtn');
-  const navLinks = document.getElementById('navLinks');
-  burgerBtn.addEventListener('click', () => navLinks.classList.toggle('open'));
-  navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => navLinks.classList.remove('open'));
-  });
-
-  // Scroll reveal: los elementos entran "de fuera hacia dentro"
-  const revealEls = document.querySelectorAll('[data-reveal]');
-  const revealObserver = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('is-visible');
-        revealObserver.unobserve(entry.target);
-      }
-    });
-  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
-  revealEls.forEach(el => revealObserver.observe(el));
-
-  // Contador animado 0 -> valor final para las cifras del hero
-  function animateCount(el) {
-    const target = parseFloat(el.dataset.target);
-    const suffix = el.dataset.suffix || '';
-    const duration = 1400;
-    const start = performance.now();
-
-    function tick(now) {
-      const progress = Math.min((now - start) / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3); // ease-out
-      const current = Math.round(target * eased);
-      el.textContent = current + suffix;
-      if (progress < 1) {
-        requestAnimationFrame(tick);
-      } else {
-        el.textContent = target + suffix;
-      }
-    }
-    requestAnimationFrame(tick);
-  }
-
-  const statsContainer = document.querySelector('.hero-stats');
-  if (statsContainer) {
-    const countEls = statsContainer.querySelectorAll('.count');
-    const countObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          countEls.forEach(el => animateCount(el));
-          countObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.4 });
-    countObserver.observe(statsContainer);
-  }
-
-  // Envío del formulario vía fetch (AJAX) a Formspree, sin recargar la página
-  const form = document.getElementById('contactForm');
-  const submitBtn = document.getElementById('submitBtn');
-  const btnLabel = submitBtn.querySelector('.btn-label');
-  const successMsg = document.getElementById('successMsg');
-  const errorMsg = document.getElementById('errorMsg');
-  const errorMsgText = errorMsg.querySelector('span');
-  let isSubmitting = false;
-
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    if (isSubmitting) return; // evita doble envío
-    isSubmitting = true;
-
-    successMsg.classList.remove('show');
-    errorMsg.classList.remove('show');
-    submitBtn.disabled = true;
-    submitBtn.classList.add('loading');
-    btnLabel.textContent = '> Enviando...';
-
-    try {
-      const response = await fetch(form.action, {
-        method: 'POST',
-        body: new FormData(form),
-        headers: { 'Accept': 'application/json' }
-      });
-
-      if (response.ok) {
-        form.reset();
-        successMsg.classList.add('show');
-      } else {
-        // Formspree devuelve el motivo del fallo en el cuerpo de la respuesta;
-        // lo mostramos en consola para poder depurarlo desde el navegador.
-        let detail = '';
-        try {
-          const data = await response.json();
-          detail = data && data.errors ? JSON.stringify(data.errors) : JSON.stringify(data);
-        } catch (parseErr) {
-          detail = 'Respuesta no JSON del servidor';
-        }
-        console.error('Formspree respondió con error', response.status, detail);
-        errorMsgText.textContent = 'Error al enviar (código ' + response.status + '). Revisa la consola del navegador para más detalle, o escribe a contacto@cyber-ad.dev.';
-        errorMsg.classList.add('show');
-      }
-    } catch (err) {
-      console.error('Fallo de red al contactar con Formspree:', err);
-      errorMsgText.textContent = 'No se pudo contactar con el servidor. Comprueba tu conexión o inténtalo de nuevo.';
-      errorMsg.classList.add('show');
-    } finally {
-      submitBtn.disabled = false;
-      submitBtn.classList.remove('loading');
-      btnLabel.textContent = '> Enviar_Solicitud()';
-      isSubmitting = false;
-    }
-  });
-</script>
-
 <!-- Cloudflare Web Analytics -->
-<script type='module' src='https://static.cloudflareinsights.com/beacon.min.js' data-cf-beacon='{"token": "a6f58d31469b4b64a17999c88889ba54"}'></script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "a6f58d31469b4b64a17999c88889ba54"}'></script>
 <!-- End Cloudflare Web Analytics -->
-
 </body>
 </html>
