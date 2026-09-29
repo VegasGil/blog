@@ -69,6 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let busy = false;
   dbg('formulario encontrado:', form.id, '→', form.action);
 
+  // Honeypot: solo lectura para que el autorrelleno del navegador NO lo rellene
+  const hp = form.querySelector('[name="_gotcha"]');
+  if (hp) { hp.setAttribute('readonly', ''); hp.setAttribute('autocomplete', 'off'); hp.value = ''; }
+
   form.addEventListener('submit', async e => {
     e.preventDefault();
     dbg('submit interceptado por JS (el navegador NO recarga la página)');
@@ -78,9 +82,9 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.disabled = true; btn.classList.add('loading'); label.textContent = '> Enviando...';
     try {
       const data = new FormData(form);
-      // Honeypot: si un bot lo rellena, fingimos éxito y no enviamos nada.
-      if (data.get('_gotcha')) { dbg('honeypot RELLENO → tratado como bot, NO se envía nada'); form.reset(); okMsg.classList.add('show'); return; }
-      // No enviamos el campo a Formspree: lo trataba como spam y descartaba el mensaje.
+      // Nunca bloqueamos el envío por el honeypot: el autorrelleno del navegador podía
+      // rellenarlo y se perdían mensajes reales. Se descarta el campo y se envía igual.
+      if (data.get('_gotcha')) dbg('⚠ el honeypot venía relleno (autorrelleno); se descarta el campo y se envía igual');
       data.delete('_gotcha');
       dbg('enviando a Formspree. Campos:', [...data.keys()].join(', '), '| _gotcha incluido:', data.has('_gotcha'));
       const res = await fetch(form.action, {
