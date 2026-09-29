@@ -70,8 +70,13 @@ document.addEventListener('DOMContentLoaded', () => {
     okMsg.classList.remove('show'); errMsg.classList.remove('show');
     btn.disabled = true; btn.classList.add('loading'); label.textContent = '> Enviando...';
     try {
+      const data = new FormData(form);
+      // Honeypot: si un bot lo rellena, fingimos éxito y no enviamos nada.
+      if (data.get('_gotcha')) { form.reset(); okMsg.classList.add('show'); return; }
+      // No enviamos el campo a Formspree: lo trataba como spam y descartaba el mensaje.
+      data.delete('_gotcha');
       const res = await fetch(form.action, {
-        method: 'POST', body: new FormData(form), headers: { Accept: 'application/json' }
+        method: 'POST', body: data, headers: { Accept: 'application/json' }
       });
       if (res.ok) {
         form.reset(); okMsg.classList.add('show');
