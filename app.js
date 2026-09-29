@@ -1,10 +1,6 @@
 // Marca JS activo (antes del primer pintado) para que el reveal solo oculte si el script corre
 document.documentElement.classList.add('js');
 
-// ===== DEBUG TEMPORAL: pon DEBUG = false, o borra todas las líneas con dbg(, cuando termines =====
-const DEBUG = true;
-const dbg = (...a) => { if (DEBUG) console.log('%c[DEBUG]', 'color:#00ff66;font-weight:bold', ...a); };
-dbg('app.js cargado y sin errores de sintaxis');
 
 document.addEventListener('DOMContentLoaded', () => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -67,7 +63,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const errText = errMsg.querySelector('span');
   const FALLBACK = 'No se pudo enviar el mensaje. Inténtalo de nuevo o escribe a contacto@cyber-ad.dev.';
   let busy = false;
-  dbg('formulario encontrado:', form.id, '→', form.action);
 
   // Honeypot: solo lectura para que el autorrelleno del navegador NO lo rellene
   const hp = form.querySelector('[name="_gotcha"]');
@@ -75,34 +70,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
   form.addEventListener('submit', async e => {
     e.preventDefault();
-    dbg('submit interceptado por JS (el navegador NO recarga la página)');
-    if (busy) { dbg('envío ignorado: ya hay uno en curso'); return; }
+    if (busy) return;
     busy = true;
     okMsg.classList.remove('show'); errMsg.classList.remove('show');
     btn.disabled = true; btn.classList.add('loading'); label.textContent = '> Enviando...';
     try {
       const data = new FormData(form);
-      // Nunca bloqueamos el envío por el honeypot: el autorrelleno del navegador podía
-      // rellenarlo y se perdían mensajes reales. Se descarta el campo y se envía igual.
-      if (data.get('_gotcha')) dbg('⚠ el honeypot venía relleno (autorrelleno); se descarta el campo y se envía igual');
+      // El honeypot no se envía a Formspree (lo trataba como spam) ni bloquea el envío.
       data.delete('_gotcha');
-      dbg('enviando a Formspree. Campos:', [...data.keys()].join(', '), '| _gotcha incluido:', data.has('_gotcha'));
       const res = await fetch(form.action, {
         method: 'POST', body: data, headers: { Accept: 'application/json' }
       });
-      dbg('Formspree respondió → status:', res.status, '| ok:', res.ok, '| cuerpo:', await res.clone().text());
       if (res.ok) {
-        dbg('✅ MENSAJE ENVIADO desde el formulario de la página');
         form.reset(); okMsg.classList.add('show');
       } else {
-        dbg('❌ Formspree RECHAZÓ el envío (status ' + res.status + ')');
         let detail = '';
         try { detail = JSON.stringify(await res.json()); } catch (_) { detail = 'respuesta no JSON'; }
         console.error('Formspree', res.status, detail); // solo para depuración
         errText.textContent = FALLBACK; errMsg.classList.add('show');
       }
     } catch (err) {
-      dbg('❌ FALLO DE RED (la petición ni llegó a Formspree):', err && err.message);
       console.error('Fallo de red', err);
       errText.textContent = FALLBACK; errMsg.classList.add('show');
     } finally {
